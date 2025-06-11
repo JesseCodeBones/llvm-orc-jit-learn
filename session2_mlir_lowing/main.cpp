@@ -5,44 +5,33 @@
 #include "mlir/InitAllDialects.h"
 #include "mlir/Tools/mlir-opt/MlirOptMain.h"
 #include "mlir/IR/PatternMatch.h"
-
-struct RemoveTestDialectOps : public mlir::RewritePattern {
-  RemoveTestDialectOps(mlir::MLIRContext *context)
-      : RewritePattern(MatchAnyOpTypeTag(), /*benefit=*/1, context) {}
-
-  llvm::LogicalResult matchAndRewrite(mlir::Operation *op,
-                                      mlir::PatternRewriter &rewriter) const override {
-    rewriter.eraseOp(op);
-    return llvm::success();
-  }
-};
-
-
-struct TestUnknownRootOpDriver
-    : public mlir::PassWrapper<TestUnknownRootOpDriver, mlir::OperationPass<>> {
-  MLIR_DEFINE_EXPLICIT_INTERNAL_INLINE_TYPE_ID(TestUnknownRootOpDriver)
-
-  llvm::StringRef getArgument() const final {
-    return "test-legalize-unknown-root-patterns";
-  }
-
-  llvm::StringRef getDescription() const final {
-    return "Test public remapped value mechanism in ConversionPatternRewriter";
-  }
-  void runOnOperation() override {
-    mlir::RewritePatternSet patterns(&getContext());
-    patterns.add<RemoveTestDialectOps>(&getContext());
-
-    mlir::ConversionTarget target(getContext());
-    if (failed(applyPartialConversion(getOperation(), target,
-                                      std::move(patterns))))
-      signalPassFailure();
-  }
-};
-
-
+// struct SimplifyRedundantTranspose : public mlir::OpRewritePattern<mlir::vector::TransposeOp> {
+//   /// We register this pattern to match every toy.transpose in the IR.
+//   /// The "benefit" is used by the framework to order the patterns and process
+//   /// them in order of profitability.
+//   SimplifyRedundantTranspose(mlir::MLIRContext *context)
+//       : OpRewritePattern<mlir::vector::TransposeOp>(context, /*benefit=*/1) {}
+//
+//   /// This method attempts to match a pattern and rewrite it. The rewriter
+//   /// argument is the orchestrator of the sequence of rewrites. The pattern is
+//   /// expected to interact with it to perform any changes to the IR from here.
+//   llvm::LogicalResult
+//   matchAndRewrite(mlir::vector::TransposeOp op,
+//                   mlir::PatternRewriter &rewriter) const override {
+//     // Look through the input of the current transpose.
+//     mlir::Value transposeInput = op.getOperand();
+//     mlir::vector::TransposeOp transposeInputOp = transposeInput.getDefiningOp<mlir::vector::TransposeOp>();
+//
+//     // Input defined by another transpose? If not, no match.
+//     if (!transposeInputOp)
+//       return llvm::failure();
+//
+//     // Otherwise, we have a redundant transpose. Use the rewriter.
+//     rewriter.replaceOp(op, {transposeInputOp.getOperand()});
+//     return llvm::success();
+//   }
+// };
+#include <iostream>
 int main(int argc , char** argv){
-    mlir::DialectRegistry registry;
-    mlir::registerAllDialects(registry);
-    mlir::PassRegistration<TestUnknownRootOpDriver>();
+    std::cout << "hellow world\n";
 }
